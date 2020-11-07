@@ -1,0 +1,23 @@
+#!bin/bash
+
+set -eo pipefail
+
+# shellcheck source=../lib.bash
+source "$(dirname "$0")/../lib.bash"
+
+function install_grain() {
+  local version=$1
+  local base_path=$2
+
+  local download_path="$(get_download_path $version $base_path)"
+  download_source $version $base_path
+  (
+    tar zxf "$download_path" -C "$base_path" --strip-components=1
+    rm -f $download_path
+
+    yarn install
+    yarn compiler build
+  )
+}
+
+check_install_type && install_grain $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH
