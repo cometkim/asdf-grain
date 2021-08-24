@@ -26,7 +26,7 @@ function extract_version() {
 
 function get_platform() {
   case "$OSTYPE" in
-    darwin*) echo -n "osx" ;;
+    darwin*) echo -n "mac" ;;
     linux*) echo -n "linux" ;;
     *) fail "Unsupported platform" ;;
   esac
