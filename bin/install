@@ -29,12 +29,8 @@ function install_version() {
   ) || (rm -rf "$install_path"; exit 1)
 }
 
-function check_install_type() {
-  if [ "$ASDF_INSTALL_TYPE" != "version" ]; then
-    fail "asdf-grain currently supports release install only"
-  fi
-}
+if [ "$ASDF_INSTALL_TYPE" != "version" ]; then
+  fail "asdf-grain currently supports release install only"
+fi
 
-check_architecture
-check_install_type "$ASDF_INSTALL_TYPE"
 install_version "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH"

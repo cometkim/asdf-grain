@@ -55,6 +55,13 @@ function get_source_url() {
   echo -n "$GITHUB_REPO/archive/$version.zip"
 }
 
+function get_temp_dir() {
+  local tmpdir
+  tmpdir=$(mktemp -d asdf-mint.XXXX)
+
+  echo -n "$tmpdir"
+}
+
 function fail() {
   echo -e "\e[31mFail:\e[m $*"
   exit 1
