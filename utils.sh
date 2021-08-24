@@ -44,7 +44,7 @@ function get_bin_url() {
   local platform=$2
   local arch=$3
 
-  local url="$GITHUB_REPO/releases/download/$version/grain-$platform-$arch"
+  local url="$GITHUB_REPO/releases/download/grain-v$version/grain-$platform-$arch"
 
   echo -n "$url"
 }
@@ -52,7 +52,7 @@ function get_bin_url() {
 function get_source_url() {
   local version=$1
 
-  echo -n "$GITHUB_REPO/archive/$version.zip"
+  echo -n "$GITHUB_REPO/archive/grain-v$version.zip"
 }
 
 function get_temp_dir() {
