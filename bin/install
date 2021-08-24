@@ -1,23 +1,40 @@
-#!bin/bash
+#!/bin/bash
 
 set -eo pipefail
 
-# shellcheck source=../lib.bash
-source "$(dirname "$0")/../lib.bash"
+# shellcheck source=../utils.sh
+source "$(dirname "$0")/../utils.sh"
 
-function install_grain() {
+function install_version() {
   local version=$1
-  local base_path=$2
+  local install_path=$2
 
-  local download_path="$(get_download_path $version $base_path)"
-  download_source $version $base_path
+  local platform
+  platform=$(get_platform)
+
+  local arch
+  arch=$(get_arch)
+
+  local bin_url
+  bin_url=$(get_bin_url "$version" "$platform" "$arch")
+
   (
-    tar zxf "$download_path" -C "$base_path" --strip-components=1
-    rm -f $download_path
+    set -e
+    mkdir -p "$install_path/bin"
 
-    yarn install
-    yarn compiler build
-  )
+    echo "Installing Grain v$version"
+    curl -sSfLo "$install_path/bin/grain" "$bin_url" || fail "Couldn't download the Grain binary from $bin_url"
+
+    chmod +x "$install_path/bin/grain"
+  ) || (rm -rf "$install_path"; exit 1)
 }
 
-check_install_type && install_grain $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH
+function check_install_type() {
+  if [ "$ASDF_INSTALL_TYPE" != "version" ]; then
+    fail "asdf-grain currently supports release install only"
+  fi
+}
+
+check_architecture
+check_install_type "$ASDF_INSTALL_TYPE"
+install_version "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH"

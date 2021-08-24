@@ -2,7 +2,30 @@
 
 set -eo pipefail
 
-# shellcheck source=../lib.bash
-source "$(dirname "$0")/../lib.bash"
+# shellcheck source=../utils.sh
+source "$(dirname "$0")/../utils.sh"
 
-check_install_type && download_source "$ASDF_INSTALL_VERSION" "$ASDF_DOWNLOAD_PATH"
+function download_source() {
+  local version=$1
+  local download_path=$2
+
+  local source_url
+  source_url=$(get_source_url "$version")
+
+  local tmpdir
+  tmpdir=$(get_temp_dir)
+  trap 'rm -rf $tmpdir' EXIT
+
+  (
+    mkdir -p "$download_path"
+
+    echo "Downloading source from $source_url"
+    curl -sSfLo "$tmpdir/archive.zip" "$source_url" || fail "Couldn't download source code from $source_url"
+
+    unzip -q "$tmpdir/archive.zip" -d "$tmpdir"
+
+    mv "$tmpdir/grain-$version/*" "$download_path/"
+  ) || (rm -rf "$download_path"; exit 1)
+}
+
+download_source "$ASDF_INSTALL_VERSION" "$ASDF_DOWNLOAD_PATH"

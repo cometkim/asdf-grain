@@ -4,6 +4,7 @@ set -eo pipefail
 
 GITHUB_REPO="https://github.com/grain-lang/grain"
 REGISTRY_URL="https://api.github.com/repos/grain-lang/grain/releases"
+
 cmd="curl -s"
 if [ -n "$GITHUB_API_TOKEN" ]; then
  cmd="$cmd -H 'Authorization: token $GITHUB_API_TOKEN'"
@@ -20,29 +21,41 @@ function sort_versions() {
 }
 
 function extract_version() {
-  grep -oE "tag_name\": \".{1,20}\"," | sed 's/tag_name\": \"v//;s/\",//'
+  grep -oE "tag_name\": \"grain-v.{1,20}\"," | sed 's/tag_name\": \"grain-v//;s/\",//'
 }
 
-function check_install_type() {
-  if [ "$ASDF_INSTALL_TYPE" != "version" ]; then
-    fail "asdf-grain currently supports release install only"
-  fi
+function get_platform() {
+  case "$OSTYPE" in
+    darwin*) echo -n "osx" ;;
+    linux*) echo -n "linux" ;;
+    *) fail "Unsupported platform" ;;
+  esac
 }
 
-function get_download_path() {
+function get_arch() {
+  case "$(uname -m)" in
+    x86_64) echo -n "x64" ;;
+    *) fail "Unsupported architecture" ;;
+  esac
+}
+
+function get_bin_url() {
   local version=$1
-  local base_path=$2
+  local platform=$2
+  local arch=$3
 
-  echo "$base_path/grain-${version}.tgz"
+  local url="$GITHUB_REPO/releases/download/$version/grain-$platform-$arch"
+
+  echo -n "$url"
 }
 
-function download_source() {
+function get_source_url() {
   local version=$1
-  local base_path=$2
 
-  local source_url="${GITHUB_REPO}/archive/v${version}.tar.gz"
-  local download_path="$(get_download_path $version $base_path)"
+  echo -n "$GITHUB_REPO/archive/$version.zip"
+}
 
-  echo "downloading Grain $version source..."
-  $cmd --output "$download_path" -C - "$source_url"
+function fail() {
+  echo -e "\e[31mFail:\e[m $*"
+  exit 1
 }
