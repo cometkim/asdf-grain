@@ -54,7 +54,7 @@ function get_source_url() {
 
 function get_temp_dir() {
   local tmpdir
-  tmpdir=$(mktemp -d asdf-mint.XXXX)
+  tmpdir=$(mktemp -d asdf-grain.XXXX)
 
   echo -n "$tmpdir"
 }
