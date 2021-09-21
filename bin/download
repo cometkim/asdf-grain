@@ -14,7 +14,7 @@ function download_source() {
 
   local tmpdir
   tmpdir=$(get_temp_dir)
-  trap 'rm -rf $tmpdir' EXIT
+  trap "rm -rf $tmpdir" EXIT
 
   (
     mkdir -p "$download_path"
