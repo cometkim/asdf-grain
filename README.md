@@ -6,7 +6,7 @@
 ## Installation
 
 ```bash
-asdf plugin add grain https://github.com/cometkim/asdf-grain.git
+asdf plugin add grain
 ```
 
 ## Usage
