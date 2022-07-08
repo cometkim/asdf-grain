@@ -2,8 +2,11 @@
 
 set -eo pipefail
 
-# shellcheck source=../utils.sh
-source "$(dirname "$0")/../utils.sh"
+current_script_path=${BASH_SOURCE[0]}
+plugin_dir=$(dirname "$(dirname "$current_script_path")")
+
+# shellcheck source=../lib/utils.bash
+source "${plugin_dir}/lib/utils.bash"
 
 function download_source() {
   local version=$1
