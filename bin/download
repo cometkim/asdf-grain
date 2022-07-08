@@ -8,27 +8,23 @@ plugin_dir=$(dirname "$(dirname "$current_script_path")")
 # shellcheck source=../lib/utils.bash
 source "${plugin_dir}/lib/utils.bash"
 
-function download_source() {
+function download_version() {
   local version=$1
   local download_path=$2
 
-  local source_url
-  source_url=$(get_source_url "$version")
+  local platform
+  platform=$(get_platform)
 
-  local tmpdir
-  tmpdir=$(get_temp_dir)
-  trap "rm -rf $tmpdir" EXIT
+  local arch
+  arch=$(get_arch)
+
+  local bin_url
+  bin_url=$(get_bin_url "$version" "$platform" "$arch")
 
   (
-    mkdir -p "$download_path"
-
-    echo "Downloading source from $source_url"
-    curl -sSfLo "$tmpdir/archive.zip" "$source_url" || fail "Couldn't download source code from $source_url"
-
-    unzip -q "$tmpdir/archive.zip" -d "$tmpdir"
-
-    mv $tmpdir/grain-grain-v$version/* "$download_path/"
-  ) || (rm -rf "$download_path"; exit 1)
+    echo "Downloading Grain v$version binary from $bin_url"
+    curl -sSfLo "$download_path/grain" "$bin_url" || "Couldn't download the Grain binary from $bin_url"
+  ) || (rm -rf "$download_path"; fail "Failed to donwload Grain v$version")
 }
 
-download_source "$ASDF_INSTALL_VERSION" "$ASDF_DOWNLOAD_PATH"
+download_version "$ASDF_INSTALL_VERSION" "$ASDF_DOWNLOAD_PATH"
