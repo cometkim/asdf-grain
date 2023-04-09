@@ -13,14 +13,17 @@ function install_version() {
   local download_path=$2
   local install_path=$3
 
-  local bin_path="$install_path/bin/grain"
+  local bin_path="$install_path/bin"
 
   (
     mkdir -p "$bin_path"
 
     echo "Installing Grain v$version"
     cp "$download_path/grain" "$bin_path"
-    chmod +x "$bin_path"
+    chmod +x "$bin_path/grain"
+    test -x "$bin_path/grain" || fail "Expected $bin_path/grain to be executable."
+
+    echo "grain $version installation was successful!"
   ) || (rm -rf "$install_path"; fail "Failed to install Grain v$version")
 }
 
